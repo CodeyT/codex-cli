@@ -1,36 +1,26 @@
 # Codex Mini CLI
 
-A simple, lightweight Command Line Interface (CLI) tool built with Node.js.
+![GitHub Repo stars](https://img.shields.io/github/stars/CodeyT/codex-cli?style=social)
+![GitHub forks](https://img.shields.io/github/forks/CodeyT/codex-cli?style=social)
+![GitHub last commit](https://img.shields.io/github/last-commit/CodeyT/codex-cli)
 
-## Features
-- Custom ASCII art banner ("Codex Cli")
-- Colour-coded terminal output
-- Centered text layout
-- Simple `init` command to generate new project folders
-
-## Usage
-
-codex-mini init <project-name>
-
-### Example
-
-codex-mini init mycenteredproject
-
-This creates a folder named `mycenteredproject` with a `README.md` file inside.
-
-## Developer Setup
-
-npm install
-sudo npm link
-
-✅ Now you can run `codex-mini` globally from your terminal.
+> A simple, lightweight command-line tool built with Node.js.  
+> Creates project folders with ASCII art headers and a custom README.
 
 ---
 
-## 🚀 Powered by:
-- Node.js
-- Chalk (for colours)
-- Figlet (for ASCII banners)
+## ✨ Features
 
-Built with ✨ by Codey Travers, 2025.
+- 🎨 Centered ASCII banner: `"Codex Cli"`
+- 🎯 Colour-coded terminal output (using Chalk)
+- 📝 Auto-generates a `README.md` file
+- ⚡ `--help`, `--version`, `--author` support
+- 🌐 Works globally with `npm link`
+
+---
+
+## 🚀 Usage
+
+```bash
+codex-mini init <project-name>
 

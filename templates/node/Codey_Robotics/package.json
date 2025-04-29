@@ -1,0 +1,8 @@
+{
+  "name": "Codey_Robotics",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js"
+  }
+}

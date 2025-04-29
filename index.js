@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const chalk = require('chalk');
 const figlet = require('figlet');
+const inquirer = require('inquirer').default; // Required for inquirer@9+
 
-// 🎨 Centered "Codex Cli" banner
-const banner = figlet.textSync('Codex Cli', {
+// 🎨 Render ASCII banner
+const banner = figlet.textSync('Codex Architect', {
   horizontalLayout: 'default',
-  verticalLayout: 'default'
+  verticalLayout: 'default',
 });
 
 const centered = banner
@@ -18,51 +19,88 @@ const centered = banner
 
 console.log(chalk.cyan(centered));
 
-const command = process.argv[2];
-const projectName = process.argv[3];
+// 🔧 CLI arguments
+const args = process.argv.slice(2);
+const command = args[0];
+const projectNameArg = args[1];
 
-// 🏷️ Version Command
-if (command === '--version' || command === '-v') {
-  console.log(chalk.blue('Codex Mini CLI version 1.0.0'));
-  process.exit(0);
-}
+function showHelp() {
+  console.log(chalk.cyan(`
 
-// 📜 Help Command
-if (command === '--help' || command === '-h') {
-  console.log(chalk.yellow(`
-Codex Mini CLI Commands:
+Codex Architect CLI Commands:
 
-  init <project-name>    Create a new project folder
-  --help, -h             Show help
-  --version, -v          Show version
-  --author, -a           Show author information
+  init                  Prompt for stack + project name
+  init <name>           Create Node.js app (default)
+  --help, -h            Show help
+  --version, -v         Show version
+  --author, -a          Show author information
+
 `));
-  process.exit(0);
 }
 
-// 👤 Author Command
-if (command === '--author' || command === '-a') {
-  console.log(chalk.magenta('Created by Codey Travers, 2025.'));
-  process.exit(0);
-}
-
-// 🚀 Init Command
-if (command === 'init' && projectName) {
-  const projectPath = path.join(process.cwd(), projectName);
+// 📦 Copy template files + inject project name
+async function initProject(name, templatePath) {
+  const projectPath = path.join(process.cwd(), name);
 
   if (fs.existsSync(projectPath)) {
-    console.log(chalk.red(`❌ Folder "${projectName}" already exists.`));
+    console.log(chalk.red(`❌ Folder "${name}" already exists.`));
     process.exit(1);
   }
 
-  fs.mkdirSync(projectPath);
-  fs.writeFileSync(
-    path.join(projectPath, 'README.md'),
-    `# ${projectName}\n\nProject initialized with Codex Mini CLI!`
-  );
+  try {
+    await fs.copy(templatePath, projectPath);
 
-  console.log(chalk.green(`✅ Project "${projectName}" created successfully.`));
-} else if (command !== 'init') {
-  console.log(chalk.yellow('⚡ Usage: codex-mini init <project-name>'));
+    // Replace placeholders
+    const filesToReplace = ['README.md', '.gitignore', 'package.json', 'requirements.txt',
+      path.join('src', 'main.js'), path.join('src', 'main.py'), path.join('src', 'index.html')
+    ];
+
+    for (const file of filesToReplace) {
+      const filePath = path.join(projectPath, file);
+      if (fs.existsSync(filePath)) {
+        let content = await fs.readFile(filePath, 'utf8');
+        content = content.replace(/{{projectName}}/g, name);
+        await fs.writeFile(filePath, content);
+      }
+    }
+
+    console.log(chalk.green(`✅ Project "${name}" created successfully.`));
+  } catch (err) {
+    console.error(chalk.red('❌ Error creating project:'), err.message);
+    process.exit(1);
+  }
 }
 
+// 📋 Stack + name prompt
+async function promptForStackAndName() {
+  const response = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'stack',
+      message: 'Select a tech stack:',
+      choices: ['node', 'python', 'web'],
+    },
+    {
+      type: 'input',
+      name: 'projectName',
+      message: 'Enter your project name:',
+      validate: input => input ? true : 'Project name cannot be empty.',
+    }
+  ]);
+  return response;
+}
+
+// 🧠 Command handler
+(async () => {
+  if (command === 'init') {
+    const { stack, projectName } = await promptForStackAndName();
+    const templatePath = path.join(__dirname, 'templates', stack);
+    await initProject(projectName, templatePath);
+  } else if (command === '--version' || command === '-v') {
+    console.log(chalk.blue('\nCodex Architect CLI version 1.0.0\n'));
+  } else if (command === '--author' || command === '-a') {
+    console.log(chalk.magenta('\nCreated by Codey Travers, 2025.\n'));
+  } else {
+    showHelp();
+  }
+})();

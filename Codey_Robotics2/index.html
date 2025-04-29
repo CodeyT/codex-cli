@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Codex Architect</title>
+  <style>
+    body {
+      background: #0f1117;
+      color: #00ffff;
+      font-family: 'Courier New', Courier, monospace;
+      white-space: pre;
+      padding: 2rem;
+      font-size: 16px;
+    }
+    #ascii {
+      line-height: 1.2;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .line {
+      opacity: 0;
+      transform: translateY(5px);
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="ascii"></div>
+
+  <script>
+    const banner = `
+   ____          _                _             _     _ _            _     
+  / ___|___   __| | _____  __    / \\   _ __ ___| |__ (_) |_ ___  ___| |_   
+ | |   / _ \\ / _\` |/ _ \\ \\/ /   / _ \\ | '__/ __| '_ \\| | __/ _ \\/ __| __|  
+ | |__| (_) | (_| |  __/>  <   / ___ \\| | | (__| | | | | ||  __/ (__| |_   
+  \\____\\___/ \\__,_|\\___/_/\\_\\ /_/   \\_\\_|  \\___|_| |_|_|\\__\\___|\\___|\\__|  
+                                                                          
+    `;
+    const asciiDiv = document.getElementById('ascii');
+    asciiDiv.style.opacity = 1;
+
+    const lines = banner.trim().split('\n');
+    lines.forEach((line, index) => {
+      setTimeout(() => {
+        const span = document.createElement('div');
+        span.textContent = line;
+        span.className = 'line';
+        span.style.animationDelay = `${index * 0.1}s`;
+        asciiDiv.appendChild(span);
+      }, index * 100);
+    });
+  </script>
+</body>
+</html>
+
